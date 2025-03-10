@@ -1,43 +1,83 @@
 # AI-Market-Analyst
 
-本專案透過 Hugging Face AI 模型分析 Yahoo Finance 的最新市場新聞，並進行 AI 自動摘要與情緒分析。系統也能透過 Email 推送分析結果，幫助投資者快速掌握市場動態。
+本專案透過 **API 爬取 Yahoo Finance 最新市場新聞**，使用 **AI 生成摘要與情緒分析**，並獲取 **市場指數數據**，最終透過 **Email 自動發送分析報告**。
 
-## 1. 功能介紹
-- 爬取 Yahoo Finance 最新市場新聞
-- AI 生成新聞摘要（Hugging Face BART）
-- AI 進行情緒分析（Positive / Negative / Neutral）
-- 視覺化新聞數據（條形圖與詞雲）
-- 發送 Email（市場新聞報告）
+## 1. 功能
+- **Google News API** 爬取 Yahoo Finance 最新新聞
+- **Hugging Face API** 生成新聞摘要 & 情緒分析
+- **Yahoo Finance API（yfinance）** 獲取市場指數（S&P 500、Nasdaq、Dow Jones、Apple、Tesla）
+- **Matplotlib & WordCloud** 生成視覺化分析（條形圖 & 文字雲）
+- **SMTP API** 自動發送 Email，附加分析報告與圖片
 
-## 2. 技術架構
-本專案使用以下技術：
-- Python 3.8+
-- Hugging Face Transformers（`facebook/bart-large-cnn` 摘要模型）
-- BeautifulSoup4（爬取 Yahoo Finance 新聞）
-- Matplotlib 與 WordCloud（新聞可視化）
-- SMTP（Gmail 發送 Email）
-
-## 3. 安裝環境
-請確保環境有 Python 3.8 以上，然後執行：
+## 2. 安裝
+```bash
 pip install -r requirements.txt
+```
+或手動安裝：
+```bash
+pip install requests beautifulsoup4 matplotlib pandas wordcloud yfinance yahoo_fin transformers torch
+```
 
-如果希望安裝成完整的 Python 套件，可以執行：
-python setup.py install
-
-## 4. 如何運行專案
-執行以下指令：
+## 3. 運行
+```bash
 python main.py
+```
+系統將：
+1. 爬取 Yahoo Finance 最新新聞
+2. 生成 AI 摘要 & 情緒分析
+3. 獲取市場數據
+4. 生成圖表（條形圖 & 文字雲）
+5. 自動發送 Email
 
-系統將會爬取 Yahoo Finance 最新新聞，生成 AI 摘要與情緒分析結果，並顯示可視化圖表。
+## 4. API 整合
+- **Google News API**：
+  ```python
+  response = requests.get("https://www.google.com/search?q=site:finance.yahoo.com+stock+market+news&tbm=nws", headers={"User-Agent": "Mozilla/5.0"})
+  ```
+- **Hugging Face API**：
+  ```python
+  summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+  sentiment_analyzer = pipeline("sentiment-analysis")
+  ```
+- **Yahoo Finance API**：
+  ```python
+  import yfinance as yf
+  price = yf.Ticker("^GSPC").history(period="1d")["Close"].iloc[-1]
+  ```
+- **SMTP API**：
+  ```python
+  server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+  server.login(sender_email, password)
+  server.sendmail(sender_email, receiver_email, msg.as_string())
+  ```
 
-## 5. 設定 Email 推送功能
-如需啟用 Email 通知，請至 Google 帳戶開啟「應用程式密碼」。
+## 5. Email 設定
+1. 啟用 **Google 兩步驟驗證**
+2. 生成 **應用程式密碼**
+3. 在 Colab 或本地輸入 Gmail 密碼：
+   ```python
+   import getpass
+   password = getpass.getpass("輸入 Gmail 應用程式密碼: ")
+   ```
 
-## 6. 視覺化結果
-本專案包含：
-條形圖：統計新聞的情緒分析結果
-詞雲：從新聞標題中提取關鍵字
+## 6. 視覺化分析
+程式將自動生成：
+- **條形圖**（新聞情緒分析）
+- **文字雲**（新聞標題關鍵字）
 
-## 7. 其他
-若爬取 Yahoo Finance 失敗，可能是 Google 變更了 HTML 結構，可嘗試更新 BeautifulSoup 解析邏輯。
-若 Email 無法發送，請確認 Gmail 設定是否允許 SMTP 存取。
+```markdown
+![情緒分析條形圖](images/sentiment_chart.png)
+![新聞標題詞雲](images/wordcloud.png)
+```
+
+## 7. 未來發展
+- 整合更多財經 API（Google Finance）
+- AI 預測市場情緒
+- Web Dashboard 可視化分析
+
+---
+📌 **GitHub Repo**：[你的 GitHub 連結]  
+📌 **Colab Notebook**：[你的 Colab 連結]
+```
+
+**這份 README 精簡且保留所有重點，方便你直接複製貼上！** 🚀
